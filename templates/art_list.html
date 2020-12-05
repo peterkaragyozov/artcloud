@@ -1,0 +1,19 @@
+{% extends 'shared/site.html' %}
+{% block site_content %}
+    <h1 class='text-center'>All Pieces of Art </h1>
+    <div class="row">
+        {% for art in arts %}
+            <div class="col-lg-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{ art.image.url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ art.name }} <br /> <br /> Author: {{ art.author }}, {{ art.year }}</h5>
+                        <p class="card-text">{{ art.description }}</p>
+                        <p class="card-text"><strong>Posted by: {{ art.user.user.username }}</strong></p>
+                        <a href="{% url 'art details or comment' art.id %}" class="btn btn-primary">See details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

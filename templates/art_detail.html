@@ -1,0 +1,66 @@
+{% extends 'shared/site.html' %}
+{% block site_content %}
+    <div class="d-flex">
+        <div class="d-inline p-2 w-50">
+            <img src="{{ art.image.url }}" class="w-50 rounded mx-auto d-block">
+        </div>
+        <div class="d-inline p-2 w-50">
+            <div>
+                <h4>"{{ art.name }}"</h4>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <h5><u>By</u> {{ art.author }}, {{ art.year }}</h5>
+                <h5><u>Art Type:</u> {{ art.type }}</h5>
+
+                <h5><u>Posted by:</u> <a href="{% url 'user profile' art.user.user_id %}"> {{ art.user.user.username }}</a>
+                </h5>
+            </div>
+
+            <div>
+
+            </div>
+            <p class="mt-2">Description: <br> {{ art.description }}</p>
+            <div>
+                {#                {% if can_edit %}#}
+                <a href="{% url 'edit art' art.pk %}" class="btn btn-success">Edit</a>
+                {#                {% endif %}#}
+                {% if can_delete %}
+                    <a href="{% url 'delete art' art.pk %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            </div>
+            {% if can_like %}
+                {% if has_liked %}
+                    <a href="{% url 'like art' art.id %}"><i class="fa fa-heart" aria-hidden="true"></i></a>
+                {% else %}
+                    <a href="{% url 'like art' art.id %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                {% endif %}
+            {% endif %}
+            <p class="mt-2">Likes: {{ art.like_set.count }}</p>
+        </div>
+    </div>
+    <div class="d-block" style="background-color: #f1e3e3; padding:2%">
+        {% if art.comment_set.exists %}
+            {% for comment in art.comment_set.all %}
+                <div class="box">
+                    <a href="{% url 'user profile' comment.user_id %}">{{ art.user.user.username }}</a>
+                    <h5><em>{{ comment.text }}</em></h5>
+                    <hr>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="box">
+                <h3>There are no comments for this art. </h3>
+            </div>
+        {% endif %}
+        {% if can_comment %}
+            <div class="box">
+                <form method="post" action="{% url 'art details or comment' art.pk %}">
+                    {{ form }}
+                    {% csrf_token %}
+                    <button class="btn btn-primary mt-2" type="submit">Add comment</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

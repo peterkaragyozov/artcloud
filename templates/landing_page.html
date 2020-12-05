@@ -1,0 +1,27 @@
+{% extends 'shared/site.html' %}
+{% block site_content %}
+    <div class="jumbotron parent">
+        <img style="width: 100%"
+             src="https://images.wallpaperscraft.com/image/vincent_van_gogh_the_starry_night_oil_canvas_117815_2560x1080.jpg" alt="">
+        <div class="absolute">
+            <h1 class="display-4">Welcome to ArtCloud</h1>
+            <p class="lead">The place where you can share all of your favourite pieces of art.</p>
+            <hr class="my-4">
+            <div class="inner cover">
+                <h1 class="cover-heading"></h1>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <p class="lead">Already have an account? <br><a href="{% url 'login' %}"
+                                                                        class="btn btn-lg btn-secondary">Sign
+                            In</a></p>
+                    </div>
+                    <div class="col-lg-6">
+                        <p class="lead"> Do not have an account yet? <br>
+                            <a href="{% url 'signup user' %}" class="btn btn-lg btn-secondary">Sign Up</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
