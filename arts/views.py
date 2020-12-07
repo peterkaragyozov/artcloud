@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-# Create your views here.
 from accounts.decorators import user_required
 from arts.forms.art_form import ArtForm
 from arts.forms.comment_form import CommentForm

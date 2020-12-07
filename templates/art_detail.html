@@ -22,9 +22,9 @@
             </div>
             <p class="mt-2">Description: <br> {{ art.description }}</p>
             <div>
-                {#                {% if can_edit %}#}
+                {% if can_edit %}
                 <a href="{% url 'edit art' art.pk %}" class="btn btn-success">Edit</a>
-                {#                {% endif %}#}
+                {% endif %}
                 {% if can_delete %}
                     <a href="{% url 'delete art' art.pk %}" class="btn btn-danger">Delete</a>
                 {% endif %}
@@ -43,7 +43,7 @@
         {% if art.comment_set.exists %}
             {% for comment in art.comment_set.all %}
                 <div class="box">
-                    <a href="{% url 'user profile' comment.user_id %}">{{ art.user.user.username }}</a>
+                    <a href="{% url 'user profile' comment.user_id %}">{{ comment.user.user.username }}</a>
                     <h5><em>{{ comment.text }}</em></h5>
                     <hr>
                 </div>
