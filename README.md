@@ -1,6 +1,10 @@
 # ArtCloud
 
-ArtCloud is a place where users can share their favourite pieces of art. Users which do not have a profile yet or haven't signed into the website, are able to see content on it but with limited functionality. Signed in users have their own profiles, in which upon request, they can upload their own profile picture. They are also able to comment and like other users' posted art pieces.
+ArtCloud is a place where users can share their favourite pieces of art. 
+
+Users which do not have a profile yet or haven't signed into the website, are able to see content on it but with limited functionality. 
+
+Signed in users have their own profiles, in which upon request, they can upload their own profile picture. They are also able to comment and like other users' posted art pieces.
 
 ## Getting Started
 
