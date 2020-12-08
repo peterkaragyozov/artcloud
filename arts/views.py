@@ -1,19 +1,19 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 
-from accounts.decorators import user_required
 from arts.forms.art_form import ArtForm
 from arts.forms.comment_form import CommentForm
 from arts.models import Art, Like, Comment
-from core.clean_up import clean_up_files
+from core.GroupRequiredMixin import GroupRequiredMixin
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 
-def list_arts(request):
-    context = {
-        'arts': Art.objects.all(),
-    }
-
-    return render(request, 'art_list.html', context)
+class ArtListView(ListView):
+    context_object_name = 'arts'
+    model = Art
+    template_name = 'art_list.html'
 
 
 @login_required
@@ -47,67 +47,27 @@ def details_or_comment_art(request, pk):
         return render(request, 'art_detail.html', context)
 
 
-def persist_art(request, art, template_name):
-    if request.method == 'GET':
-        form = ArtForm(instance=art)
-
-        context = {
-            'form': form,
-            'art': art,
-        }
-
-        return render(request, f'{template_name}.html', context)
-    else:
-        old_image = art.image
-        form = ArtForm(
-            request.POST,
-            request.FILES,
-            instance=art
-        )
-        if form.is_valid():
-            if old_image:
-                clean_up_files(old_image.path)
-            form.save()
-            Like.objects.filter(art_id=art.id).delete()
-
-            return redirect('art details or comment', art.pk)
-
-        context = {
-            'form': form,
-            'art': art,
-        }
-
-        return render(request, f'{template_name}.html', context)
+class ArtCreateView(GroupRequiredMixin, CreateView, LoginRequiredMixin, ArtForm):
+    model = Art
+    form_class = ArtForm
+    groups = ['Regular User']
+    template_name = 'art_create.html'
+    success_url = reverse_lazy('list arts')
 
 
-@login_required
-def create_art(request):
-    art = Art()
-    return persist_art(request, art, 'art_create')
+class ArtEditView(GroupRequiredMixin, UpdateView, LoginRequiredMixin, ArtForm):
+    model = Art
+    form_class = ArtForm
+    groups = ['Regular User']
+    template_name = 'art_edit.html'
+    success_url = reverse_lazy('list arts')
 
 
-@user_required(Art)
-def edit_art(request, pk):
-    art = Art.objects.get(pk=pk)
-    return persist_art(request, art, 'art_edit')
-
-
-@login_required
-def delete_art(request, pk):
-    art = Art.objects.get(pk=pk)
-    if art.user.user != request.user:
-        # forbid
-        pass
-
-    if request.method == 'GET':
-        context = {
-            'art': art,
-        }
-
-        return render(request, 'art_delete.html', context)
-    else:
-        art.delete()
-        return redirect('list arts')
+class ArtDeleteView(GroupRequiredMixin, DeleteView, LoginRequiredMixin):
+    model = Art
+    groups = ['Regular User']
+    template_name = 'art_delete.html'
+    success_url = reverse_lazy('list arts')
 
 
 @login_required
