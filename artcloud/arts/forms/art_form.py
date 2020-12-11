@@ -12,7 +12,7 @@ class ArtForm(forms.ModelForm):
 
     class Meta:
         model = Art
-        fields = '__all__'
+        exclude = ('user',)
         widgets = {
             'image_url': forms.TextInput(
                 attrs={

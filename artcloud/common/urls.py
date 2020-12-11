@@ -1,7 +1,7 @@
 from django.urls import path
 
-from artcloud.common.views import landing_page
+from artcloud.common.views import LandingPage
 
 urlpatterns = [
-    path('', landing_page, name='index'),
+    path('', LandingPage.as_view(), name='index'),
 ]
