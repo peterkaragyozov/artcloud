@@ -20,9 +20,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'arts',
-    'accounts',
-    'common',
+    'artcloud.arts',
+    'artcloud.accounts',
+    'artcloud.common',
 
     'django.contrib.admin',
     'django.contrib.auth',
