@@ -19,35 +19,53 @@ class ArtListView(ListView):
     template_name = 'art_list.html'
 
 
-@login_required
-def details_or_comment_art(request, pk):
-    art = Art.objects.get(pk=pk)
-    if request.method == 'GET':
-        context = {
-            'art': art,
-            'form': CommentForm(),
-            'can_edit': request.user == art.user.user,
-            'can_delete': request.user == art.user.user,
-            'can_like': request.user != art.user.user,
-            'has_liked': art.like_set.filter(user_id=request.user.userprofile.id).exists(),
-            'can_comment': request.user != art.user.user,
-        }
+class ArtDetailsView(DetailView):
+    model = Art
+    template_name = 'art_detail.html'
+    context_object_name = 'art'
 
-        return render(request, 'art_detail.html', context)
-    else:
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = Comment(text=form.cleaned_data['text'])
-            comment.art = art
-            comment.user = request.user.userprofile
-            comment.save()
-            return redirect('art details or comment', pk)
-        context = {
-            'art': art,
-            'form': form,
-        }
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        art = context[self.context_object_name]
+        context['form'] = CommentForm()
+        context['can_delete'] = self.request.user == art.user.user
+        context['can_edit'] = self.request.user == art.user.user
+        context['can_like'] = self.request.user != art.user.user
+        context['has_liked'] = art.like_set.filter(user_id=self.request.user.userprofile.id).exists()
+        context['can_comment'] = self.request.user != art.user.user
+        context['comments'] = list(art.comment_set.all())
 
-        return render(request, 'art_detail.html', context)
+        return context
+
+
+class LikeArtView(View):
+    def get(self, request, **kwargs):
+        user_profile = request.user.userprofile
+        art = Art.objects.get(pk=kwargs['pk'])
+
+        like = art.like_set.filter(user_id=user_profile.id).first()
+        if like:
+            like.delete()
+        else:
+            like = Like(
+                user=user_profile,
+                art=art,
+                test='as'
+            )
+            like.save()
+
+        return redirect('art details', art.id)
+
+
+class CommentArtView(auth_mixins.LoginRequiredMixin, FormView):
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        comment = form.save(commit=False)
+        comment.user = self.request.user.userprofile
+        comment.art = Art.objects.get(pk=self.kwargs['pk'])
+        comment.save()
+        return redirect('art details', self.kwargs['pk'])
 
 
 class ArtCreateView(auth_mixins.LoginRequiredMixin, CreateView):
@@ -77,7 +95,7 @@ class ArtEditView(auth_mixins.LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         old_image = self.get_object().image
-        if old_image:
+        if old_image and old_image != form.cleaned_data['image']:
             clean_up_files(old_image.path)
         return super().form_valid(form)
 
@@ -92,16 +110,3 @@ class ArtDeleteView(auth_mixins.LoginRequiredMixin, DeleteView):
         if art.user_id != request.user.userprofile.id:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
-
-
-@login_required
-def like_art(request, pk):
-    like = Like.objects.filter(user_id=request.user.userprofile.id, art_id=pk).first()
-    if like:
-        like.delete()
-    else:
-        art = Art.objects.get(pk=pk)
-        like = Like(test=str(pk), user=request.user.userprofile)
-        like.art = art
-        like.save()
-    return redirect('art details or comment', pk)

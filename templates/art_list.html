@@ -10,7 +10,7 @@
                         <h5 class="card-title">{{ art.name }} <br /> <br /> Author: {{ art.author }}, {{ art.year }}</h5>
                         <p class="card-text">{{ art.description }}</p>
                         <p class="card-text"><strong>Posted by: {{ art.user.user.username }}</strong></p>
-                        <a href="{% url 'art details or comment' art.id %}" class="btn btn-primary">See details</a>
+                        <a href="{% url 'art details' art.id %}" class="btn btn-primary">See details</a>
                     </div>
                 </div>
             </div>
